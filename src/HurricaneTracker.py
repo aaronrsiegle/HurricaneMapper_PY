@@ -2,8 +2,8 @@
 # ## Hurricane Tracking Workflow
 # This notebook selects trackpoints from a features class of trackpoints for a selected storm (season & name), creates a track line, and extracts US counties that intersect that trackline. 
 # 
-# Fall 202X  
-# John.Fay@duke.edu
+# Fall 2025
+# aaron.siegle@duke.edu
 
 # %%
 #Import package
@@ -29,6 +29,17 @@ ibtracs_NA_points = str(raw_folder_path /'IBTrACS_NA.shp')
 usa_counties = 'https://services.arcgis.com/P3ePLMYs2RVChkJx/arcgis/rest/services/USA_Counties_Generalized_Boundaries/FeatureServer/0'
 storm_track_points =  "memory\\track_points"
 storm_track_line = "memory\\Tracklines"
+
+# %%
+# Create list of storms 
+cursor = arcpy.da.SearchCursor(
+    in_table= ibtracs_NA_points,
+    where_clause='SEASON = 2000',
+    field_names= ['NAME']
+)
+
+# Delete cursor 
+del cursor
 
 # %% [markdown]
 # #### Select point features corresponding to a specific storm (season & name)
@@ -65,10 +76,8 @@ select_output = arcpy.management.SelectLayerByLocation(
 select_result = select_output.getOutput(0)
 
 # %%
-#Copy selected counties to output feature class
-arcpy.management.CopyFeatures(
-    in_features = select_result, 
-    out_feature_class = str(affected_counties)
-)
+# Count the counties 
+county_count = int(arcpy.GetCount_management(select_result).getOutput(0))
 
 
+# %%
